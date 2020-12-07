@@ -9,9 +9,12 @@ import android.util.Log
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.preferences.SubjectAttributes
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
+import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
+import org.joda.time.LocalTime
 
 class AutoMuteSetup : LessonEventSetup() {
 	private lateinit var preferenceManager: PreferenceManager
@@ -25,7 +28,11 @@ class AutoMuteSetup : LessonEventSetup() {
 	}
 
 	override fun onLoadingSuccess(context: Context, items: List<TimegridItem>) {
-		items.merged().sortedBy { it.startDateTime }.zipWithNext().withLast().forEach {
+		items.filter {
+			val filtered = PreferenceUtils.getPrefStringSet(preferenceManager, "preference_timetable_subject_filter")
+			val sa = SubjectAttributes(it.startTime.toLocalTime(), it.endTime.toLocalTime(), it.startDateTime.dayOfWeek.toString(), it.title.toString())
+			!filtered.contains(sa.day + '|' + sa.startTime.toString() + '|' + sa.endTime.toString() + '|' + sa.name)
+		}.merged().sortedBy { it.startDateTime }.zipWithNext().withLast().forEach {
 			it.first?.let { item ->
 				val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 				val id = item.startDateTime.millisOfDay / 1000
@@ -56,3 +63,10 @@ class AutoMuteSetup : LessonEventSetup() {
 
 	override fun onLoadingError(context: Context, requestId: Int, code: Int?, message: String?) {}
 }
+
+data class SubjectAttributes(
+		val startTime: LocalTime,
+		val endTime: LocalTime,
+		val day: String,
+		val name: String
+)

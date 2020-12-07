@@ -110,7 +110,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	}
 
 	override fun onPreferenceStartScreen(preferenceFragmentCompat: PreferenceFragmentCompat,
-	                                     preferenceScreen: PreferenceScreen): Boolean {
+										 preferenceScreen: PreferenceScreen): Boolean {
 		val fragment = PreferencesFragment()
 		val args = Bundle()
 		args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.key)

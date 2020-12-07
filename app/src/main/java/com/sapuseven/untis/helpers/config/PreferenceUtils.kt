@@ -27,4 +27,8 @@ object PreferenceUtils {
 	fun getPrefString(manager: PreferenceManager, key: String, default: String?): String? {
 		return manager.defaultPrefs.getString(key, default)
 	}
+
+	fun getPrefStringSet(manager: PreferenceManager, key: String) : Set<String> {
+		return manager.defaultPrefs.getStringSet(key, emptySet()) ?: emptySet()
+	}
 }

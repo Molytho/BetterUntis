@@ -11,11 +11,13 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.params.PeriodDataParams
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
 import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonDecodingException
 import org.joda.time.Instant

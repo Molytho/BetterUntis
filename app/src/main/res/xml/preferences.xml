@@ -217,6 +217,11 @@
 			android:key="preference_timetable_personal_timetable"
 			android:title="@string/preference_timetable_personal_timetable" />
 
+		<com.sapuseven.untis.preferences.SubjectSetPickerPreference
+			android:key="preference_timetable_subject_filter"
+			android:summary="preference_timetable_subject_filter"
+			android:title="preference_timetable_subject_filter" />
+
 		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_hide_time_stamps_default"
 			android:key="preference_timetable_hide_time_stamps"

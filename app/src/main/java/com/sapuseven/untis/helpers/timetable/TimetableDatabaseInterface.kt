@@ -89,4 +89,8 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 			else -> emptyList()
 		})
 	}
+
+	fun getSubjects(): Collection<Subject> {
+		return allSubjects.values
+	}
 }

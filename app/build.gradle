@@ -19,29 +19,18 @@ android {
 	}
 
 	signingConfigs {
-		def propertiesFile = file("signing.properties")
+		def propertiesFile = file("../signing.properties")
 
 		ext.signingProperties = new Properties()
-		if (propertiesFile.exists()) {
-			propertiesFile.withInputStream {
-				stream -> signingProperties.load(stream)
-			}
+		propertiesFile.withInputStream {
+			stream -> signingProperties.load(stream)
 		}
 
-		if (file("BetterUntis.jks").exists()) {
-			release {
-				storeFile file("BetterUntis.jks")
-				storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
-				keyAlias "release"
-				keyPassword signingProperties["keyReleasePassword"] != null ? signingProperties["keyReleasePassword"] : System.getenv("KEY_RELEASE_PASSWORD")
-			}
-
-			debug {
-				storeFile file("BetterUntis.jks")
-				storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
-				keyAlias "debug"
-				keyPassword signingProperties["keyDebugPassword"] != null ? signingProperties["keyDebugPassword"] : System.getenv("KEY_DEBUG_PASSWORD")
-			}
+		release {
+			storeFile file(signingProperties['storeFile'])
+			storePassword signingProperties['storePassword'] != null ? signingProperties['storePassword'] : System.getenv("KEYSTORE_PASSWORD")
+			keyAlias signingProperties['keyAlias']
+			keyPassword signingProperties['keyPassword'] != null ? signingProperties['keyPassword'] : System.getenv("KEY_RELEASE_PASSWORD")
 		}
 	}
 

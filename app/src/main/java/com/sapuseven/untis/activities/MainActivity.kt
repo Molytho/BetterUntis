@@ -264,9 +264,9 @@ class MainActivity :
 				return setTarget(
 						profileUser.userData.elemId,
 						type,
-						profileUser.userData.displayName)
+						profileUser.getDisplayedName(applicationContext))
 			} ?: run {
-				return setTarget(anonymous = true)
+				return setTarget(true, profileUser.getDisplayedName(applicationContext))
 			}
 		} else {
 			val customId = preferences.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
@@ -341,7 +341,7 @@ class MainActivity :
 	}
 
 	private fun updateNavDrawer(navigationView: NavigationView) {
-		val line1 = if (profileUser.anonymous) getString(R.string.all_anonymous) else profileUser.userData.displayName
+		val line1 = profileUser.getDisplayedName(applicationContext)
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
 				if (line1.isBlank()) getString(R.string.app_name) else line1
@@ -559,8 +559,8 @@ class MainActivity :
 
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
+		val labels = MutableList(0) { return@MutableList "" }
 		val range = RangePreference.convertToPair(PreferenceUtils.getPrefString(preferences, "preference_timetable_range", null))
-
 		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
@@ -575,12 +575,16 @@ class MainActivity :
 
 			lines.add(startTimeInt)
 			lines.add(endTimeInt)
+			labels.add(hour.label)
 		}
 
 		if (!PreferenceUtils.getPrefBool(preferences, "preference_timetable_range_index_reset"))
 			weekView.hourIndexOffset = (range?.first ?: 1) - 1
 		weekView.hourLines = lines.toIntArray()
-
+		weekView.hourLabels = labels.toTypedArray().let { hourLabelArray ->
+			if(hourLabelArray.joinToString("")=="") IntArray(labels.size, fun(idx:Int):Int{return idx+1}).map{it.toString()}.toTypedArray()
+			else hourLabelArray
+		}
 		weekView.startTime = lines.first()
 		weekView.endTime = lines.last() + 30 // TODO: Don't hard-code this offset
 	}
@@ -822,14 +826,14 @@ class MainActivity :
 		}
 	}
 
-	private fun setTarget(anonymous: Boolean): Boolean {
+	private fun setTarget(anonymous: Boolean, displayName:CharSequence): Boolean {
+		supportActionBar?.title = displayName
 		if (anonymous) {
 			showLoading(false)
 
 			weeklyTimetableItems.clear()
 			weekView.notifyDataSetChanged()
 
-			supportActionBar?.title = getString(R.string.all_anonymous)
 			constraintlayout_main_anonymouslogininfo.visibility = View.VISIBLE
 
 			if (displayedElement == null) return false
@@ -847,11 +851,10 @@ class MainActivity :
 			displayedElement = it
 		}
 
-		setTarget(anonymous = false)
+		setTarget(false, displayNameCache)
 
 		weeklyTimetableItems.clear()
 		weekView.notifyDataSetChanged()
-		supportActionBar?.title = displayNameCache
 		return true
 	}
 
